@@ -22,6 +22,9 @@ RUN set -xo pipefail \
           curl \
           unzip \
       && locale-gen en_US.UTF-8 \
+      && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
+      && dpkg-reconfigure --frontend=noninteractive locales \
+      && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
       && adduser --disabled-password --gecos "" steam \
       && mkdir ${STEAMCMD_DIR} \
       && cd ${STEAMCMD_DIR} \
@@ -38,15 +41,20 @@ RUN set -xo pipefail \
         } > ${STEAM_DIR}/autoupdate_script.txt \
       && mkdir ${CSGO_DIR} \
       && chown -R steam:steam ${STEAM_DIR} \
-      && rm -rf /var/lib/apt/lists/*
+      && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US:en \
+    LANGUAGE=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
 COPY --chown=steam:steam steam-dir ${STEAM_DIR}/
 
+RUN echo "Installing CSGO" \
+      && $STEAMCMD_DIR/steamcmd.sh +login anonymous +force_install_dir $CSGO_DIR +app_update $CSGO_APP_ID +quit \
+      && $STEAMCMD_DIR/steamcmd.sh +login anonymous +force_install_dir $CSGO_DIR +app_update $CSGO_APP_ID +quit
+
 USER steam
+
 WORKDIR ${CSGO_DIR}
-VOLUME ${CSGO_DIR}
+
 ENTRYPOINT exec ${STEAM_DIR}/start.sh
