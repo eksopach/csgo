@@ -44,7 +44,7 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
-COPY --chown=steam:steam containerfs ${STEAM_DIR}/
+COPY --chown=steam:steam steam-dir ${STEAM_DIR}/
 
 USER steam
 WORKDIR ${CSGO_DIR}
