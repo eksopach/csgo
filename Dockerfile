@@ -1,4 +1,5 @@
 FROM ubuntu:bionic
+LABEL maintainer="shk.rajat@gmail.com"
 
 ENV TERM xterm
 
@@ -49,12 +50,10 @@ ENV LANG=en_US.UTF-8 \
 
 COPY --chown=steam:steam steam-dir ${STEAM_DIR}/
 
-RUN echo "Installing CSGO" \
-      && $STEAMCMD_DIR/steamcmd.sh +login anonymous +force_install_dir $CSGO_DIR +app_update $CSGO_APP_ID +quit \
-      && $STEAMCMD_DIR/steamcmd.sh +login anonymous +force_install_dir $CSGO_DIR +app_update $CSGO_APP_ID +quit
-
 USER steam
 
 WORKDIR ${CSGO_DIR}
+
+RUN "$STEAMCMD_DIR/steamcmd.sh" +login anonymous +quit
 
 ENTRYPOINT exec ${STEAM_DIR}/start.sh

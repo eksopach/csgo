@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
-CONTAINER_NAME ?= csgo-dedicated-server 
-IMAGE_NAME ?= kmallea/csgo:latest
+CONTAINER_NAME ?= csgo 
+IMAGE_NAME ?= eksopach/csgo:latest
 SERVER_HOSTNAME ?= Counter-Strike: Global Offensive Dedicated Server
 SERVER_PASSWORD ?=
 RCON_PASSWORD ?= changeme
@@ -38,11 +38,12 @@ image: Dockerfile
 
 server:
 	docker run \
+		--rm \
 		-i \
 		-t \
 		-d \
 		--net=host \
-		--mount type=bind,source="$(PWD)/csgo-dir",target=/home/steam/csgo \
+		--mount type=bind,source="${HOME}/Volumes/csgo",target=/home/steam/csgo \
 		-e "SERVER_HOSTNAME=$(SERVER_HOSTNAME)" \
 		-e "SERVER_PASSWORD=$(SERVER_PASSWORD)" \
 		-e "RCON_PASSWORD=$(RCON_PASSWORD)" \
@@ -61,6 +62,7 @@ server:
 		-e "LAN=$(LAN)" \
 		-e "SOURCEMOD_ADMINS=$(SOURCEMOD_ADMINS)" \
 		-e "RETAKES=$(RETAKES)" \
+		--dns 192.168.43.205 \
 		--name $(CONTAINER_NAME) \
 		$(IMAGE_NAME)
 
